@@ -71,8 +71,9 @@ export default function ChatRoom() {
         if (conversationData && conversationData.profiles) {
           // Fix: Check if profiles contains the expected properties before assigning
           const profileData = conversationData.profiles;
-          // Only set otherProfile if the data has the required fields
+          // Only set otherProfile if the data has the required fields and is not null
           if (
+            profileData && 
             typeof profileData === 'object' && 
             'id' in profileData && 
             'name' in profileData && 
