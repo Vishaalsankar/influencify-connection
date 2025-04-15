@@ -13,6 +13,7 @@ import FindInfluencers from "./pages/Influencers/FindInfluencers";
 import CampaignsList from "./pages/Campaigns/CampaignsList";
 import CampaignDetail from "./pages/Campaigns/CampaignDetail";
 import NotFound from "./pages/NotFound";
+import NewCampaign from "./pages/Campaigns/NewCampaign";
 
 const queryClient = new QueryClient();
 
@@ -32,11 +33,10 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/find-influencers" element={<FindInfluencers />} />
               <Route path="/campaigns" element={<CampaignsList />} />
+              <Route path="/campaigns/new" element={<NewCampaign />} />
               <Route path="/campaigns/:id" element={<CampaignDetail />} />
-              {/* Add other authenticated routes here */}
             </Route>
             
-            {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

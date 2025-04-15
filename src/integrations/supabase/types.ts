@@ -44,6 +44,173 @@ export type Database = {
           },
         ]
       }
+      campaign_contents: {
+        Row: {
+          campaign_id: string | null
+          comments: number | null
+          created_at: string | null
+          date: string | null
+          description: string | null
+          engagement: number | null
+          id: string
+          influencer_id: string | null
+          likes: number | null
+          platform: string | null
+          status: string | null
+          type: string | null
+          updated_at: string | null
+          views: number | null
+        }
+        Insert: {
+          campaign_id?: string | null
+          comments?: number | null
+          created_at?: string | null
+          date?: string | null
+          description?: string | null
+          engagement?: number | null
+          id?: string
+          influencer_id?: string | null
+          likes?: number | null
+          platform?: string | null
+          status?: string | null
+          type?: string | null
+          updated_at?: string | null
+          views?: number | null
+        }
+        Update: {
+          campaign_id?: string | null
+          comments?: number | null
+          created_at?: string | null
+          date?: string | null
+          description?: string | null
+          engagement?: number | null
+          id?: string
+          influencer_id?: string | null
+          likes?: number | null
+          platform?: string | null
+          status?: string | null
+          type?: string | null
+          updated_at?: string | null
+          views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_contents_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_contents_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaign_influencers: {
+        Row: {
+          campaign_id: string | null
+          created_at: string | null
+          fee: number | null
+          id: string
+          influencer_id: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          campaign_id?: string | null
+          created_at?: string | null
+          fee?: number | null
+          id?: string
+          influencer_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          campaign_id?: string | null
+          created_at?: string | null
+          fee?: number | null
+          id?: string
+          influencer_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_influencers_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_influencers_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaigns: {
+        Row: {
+          brand_id: string
+          budget: number | null
+          category: string | null
+          created_at: string | null
+          description: string | null
+          end_date: string | null
+          goals: string | null
+          id: string
+          name: string
+          requirements: string | null
+          start_date: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          brand_id: string
+          budget?: number | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          goals?: string | null
+          id?: string
+          name: string
+          requirements?: string | null
+          start_date?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          brand_id?: string
+          budget?: number | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          goals?: string | null
+          id?: string
+          name?: string
+          requirements?: string | null
+          start_date?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaigns_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           brand_id: string | null
