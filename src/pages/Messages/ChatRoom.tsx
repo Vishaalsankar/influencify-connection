@@ -69,9 +69,19 @@ export default function ChatRoom() {
         if (conversationError) throw conversationError;
         
         if (conversationData && conversationData.profiles) {
-          // Fix: Use the profiles data correctly to create a ChatProfile object
-          const profileData = conversationData.profiles as ChatProfile;
-          setOtherProfile(profileData);
+          // Fix: Check if profiles contains the expected properties before assigning
+          const profileData = conversationData.profiles;
+          // Only set otherProfile if the data has the required fields
+          if (
+            typeof profileData === 'object' && 
+            'id' in profileData && 
+            'name' in profileData && 
+            'role' in profileData
+          ) {
+            setOtherProfile(profileData as ChatProfile);
+          } else {
+            console.error("Invalid profile data format:", profileData);
+          }
         }
 
         // Get messages
