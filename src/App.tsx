@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,9 @@ import CampaignsList from "./pages/Campaigns/CampaignsList";
 import CampaignDetail from "./pages/Campaigns/CampaignDetail";
 import NotFound from "./pages/NotFound";
 import NewCampaign from "./pages/Campaigns/NewCampaign";
+import MessagesPage from "./pages/Messages/MessagesPage";
+import ChatRoom from "./pages/Messages/ChatRoom";
+import EmptyChatState from "./pages/Messages/EmptyChatState";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +39,11 @@ const App = () => (
               <Route path="/campaigns" element={<CampaignsList />} />
               <Route path="/campaigns/new" element={<NewCampaign />} />
               <Route path="/campaigns/:id" element={<CampaignDetail />} />
+              
+              <Route path="/messages" element={<MessagesPage />}>
+                <Route index element={<EmptyChatState />} />
+                <Route path=":conversationId" element={<ChatRoom />} />
+              </Route>
             </Route>
             
             <Route path="*" element={<NotFound />} />

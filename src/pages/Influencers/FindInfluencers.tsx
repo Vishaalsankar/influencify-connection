@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, Star, Filter, MessageSquare, Plus } from "lucide-react";
+import { Search, Filter, MessageSquare, Plus } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -28,6 +28,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { toast } from "@/components/ui/use-toast";
+import ChatModal from "@/components/ChatModal";
+import { supabase } from "@/integrations/supabase/client";
 
 // Sample data for influencers
 const SAMPLE_INFLUENCERS = [
@@ -130,6 +135,10 @@ export default function FindInfluencers() {
   const [category, setCategory] = useState("All Categories");
   const [searchQuery, setSearchQuery] = useState("");
   const [view, setView] = useState<"grid" | "table">("grid");
+  const [chatInfluencer, setChatInfluencer] = useState<any | null>(null);
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Filter influencers based on search, price range, and category
   const filteredInfluencers = SAMPLE_INFLUENCERS.filter((influencer) => {
@@ -155,6 +164,101 @@ export default function FindInfluencers() {
       return `${(count / 1000).toFixed(1)}K`;
     }
     return count.toString();
+  };
+
+  const handleChatClick = (influencer: any) => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to chat with influencers",
+        variant: "destructive",
+      });
+      navigate("/login");
+      return;
+    }
+
+    setChatInfluencer(influencer);
+    setIsChatModalOpen(true);
+  };
+
+  const handleInvite = async (influencer: any) => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to invite influencers",
+        variant: "destructive",
+      });
+      navigate("/login");
+      return;
+    }
+
+    try {
+      // Check if user has campaigns
+      const { data: campaigns, error: campaignsError } = await supabase
+        .from("campaigns")
+        .select("id, name")
+        .eq("brand_id", user.id);
+
+      if (campaignsError) throw campaignsError;
+
+      if (!campaigns || campaigns.length === 0) {
+        toast({
+          title: "No campaigns",
+          description: "You need to create a campaign first",
+          action: (
+            <Button variant="outline" onClick={() => navigate("/campaigns/new")}>
+              Create Campaign
+            </Button>
+          ),
+        });
+        return;
+      }
+
+      // For demo purposes, use the first campaign
+      const campaignId = campaigns[0].id;
+
+      // Check if influencer is already invited
+      const { data: existing, error: checkError } = await supabase
+        .from("campaign_influencers")
+        .select("id")
+        .eq("campaign_id", campaignId)
+        .eq("influencer_id", influencer.id)
+        .maybeSingle();
+
+      if (checkError) throw checkError;
+
+      if (existing) {
+        toast({
+          title: "Already invited",
+          description: "This influencer has already been invited to your campaign",
+        });
+        return;
+      }
+
+      // Invite influencer to campaign
+      const { error: inviteError } = await supabase
+        .from("campaign_influencers")
+        .insert({
+          campaign_id: campaignId,
+          influencer_id: influencer.id,
+          fee: influencer.fee,
+        });
+
+      if (inviteError) throw inviteError;
+
+      toast({
+        title: "Invitation sent",
+        description: `Invitation sent to ${influencer.name} for your campaign "${campaigns[0].name}"`,
+      });
+
+    } catch (error) {
+      console.error("Error inviting influencer:", error);
+      toast({
+        title: "Error",
+        description: "Failed to invite influencer. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -293,11 +397,20 @@ export default function FindInfluencers() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button className="flex-1" size="sm">
+                  <Button 
+                    className="flex-1" 
+                    size="sm"
+                    onClick={() => handleChatClick(influencer)}
+                  >
                     <MessageSquare className="mr-2 h-4 w-4" />
                     Chat
                   </Button>
-                  <Button className="flex-1" variant="outline" size="sm">
+                  <Button 
+                    className="flex-1" 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleInvite(influencer)}
+                  >
                     <Plus className="mr-2 h-4 w-4" />
                     Invite
                   </Button>
@@ -349,10 +462,10 @@ export default function FindInfluencers() {
                     <TableCell className="text-right">{formatInr(influencer.fee)}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button size="sm" variant="ghost">
+                        <Button size="sm" variant="ghost" onClick={() => handleChatClick(influencer)}>
                           <MessageSquare className="h-4 w-4" />
                         </Button>
-                        <Button size="sm" variant="ghost">
+                        <Button size="sm" variant="ghost" onClick={() => handleInvite(influencer)}>
                           <Plus className="h-4 w-4" />
                         </Button>
                       </div>
@@ -363,6 +476,18 @@ export default function FindInfluencers() {
             </Table>
           </CardContent>
         </Card>
+      )}
+
+      {/* Chat Modal */}
+      {chatInfluencer && (
+        <ChatModal
+          isOpen={isChatModalOpen}
+          onClose={() => {
+            setIsChatModalOpen(false);
+            setChatInfluencer(null);
+          }}
+          influencer={chatInfluencer}
+        />
       )}
     </div>
   );
