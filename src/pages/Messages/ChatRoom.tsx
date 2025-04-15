@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -79,9 +78,11 @@ export default function ChatRoom() {
             'name' in profileData && 
             'role' in profileData
           ) {
-            setOtherProfile(profileData as ChatProfile);
-          } else {
-            console.error("Invalid profile data format:", profileData);
+            setOtherProfile({
+              id: profileData.id,
+              name: profileData.name || 'Unknown',
+              role: profileData.role || 'unknown'
+            });
           }
         }
 
