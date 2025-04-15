@@ -68,8 +68,10 @@ export default function ChatRoom() {
 
         if (conversationError) throw conversationError;
         
-        if (conversationData) {
-          setOtherProfile(conversationData.profiles);
+        if (conversationData && conversationData.profiles) {
+          // Fix: Use the profiles data correctly to create a ChatProfile object
+          const profileData = conversationData.profiles as ChatProfile;
+          setOtherProfile(profileData);
         }
 
         // Get messages
