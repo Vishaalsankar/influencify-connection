@@ -1,5 +1,6 @@
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 // Define user roles
 export type UserRole = "admin" | "influencer" | "brand" | null;
@@ -136,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   // Load user from local storage on initial render
-  React.useEffect(() => {
+  useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));

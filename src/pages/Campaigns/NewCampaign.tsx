@@ -36,6 +36,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -67,6 +68,7 @@ const CATEGORIES = [
 
 export default function NewCampaign() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -83,11 +85,21 @@ export default function NewCampaign() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to create a campaign.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Insert new campaign
       const { data: campaign, error } = await supabase
         .from('campaigns')
         .insert({
           name: values.name,
+          brand_id: user.id,
           category: values.category,
           budget: parseFloat(values.budget),
           description: values.description,
